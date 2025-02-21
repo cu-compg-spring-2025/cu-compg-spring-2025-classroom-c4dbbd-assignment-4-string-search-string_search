@@ -5,7 +5,7 @@
 \begin{document}
 
 \title{String Search}
-\author{Ryan Layer}
+\author{Pranav Kaliaperumal}
 \maketitle
 
 \section{Introduction}
@@ -18,8 +18,8 @@ challenge. This problem involves two input strings: a typically longer string,
 the text $T$, and a usually shorter string, the pattern $P$. The
 objective is to locate every instance of $P$ within $T$. Here we analyze the
 the efficiency and memory consumption of a basic string search algorithm that
-aligns $P$ with all possible positions in $T$.  The algorithm's runtime
-correlated with $T$'s length and it's additional memory requirement were
+aligns $P$ with all possible positions in $T$. The algorithm's runtime
+correlated with $T$'s length and its additional memory requirement were
 minimal.
 
 \section{Results}
@@ -49,7 +49,7 @@ the text $T$.
 
 \subsection{Naive string search}
 The naive string search algorithm considers all possible alignments of the
-pattern $P$ with the text $T$. Staring at the first position in $T$, the
+pattern $P$ with the text $T$. Starting at the first position in $T$, the
 algorithm compares $P$'s characters with the corresponding characters in $T$.
 If all characters match, the algorithm records the alignment's position in $T$.
 The algorithm then repeats this process for the next alignment. If any of the 
@@ -58,16 +58,34 @@ alignment breaks and then $P$ shifts down one position in $T$, and the process
 repeats. This process continues until $P$ has been compared to all possible
 alignments in $T$, then returns the recorded positions.
 
+\subsection{Boyer-Moore string search}
+The Boyer-Moore algorithm improves upon the naive approach by skipping sections
+of text based on preprocessing of the pattern $P$. This is achieved through two
+heuristics: the bad character rule and the good suffix rule.
+
+The bad character rule allows the algorithm to skip alignments where a mismatch
+occurs by jumping the pattern forward based on the last occurrence of the
+mismatched character in $P$. The good suffix rule shifts the pattern based on
+the longest suffix that matches within $P$.
+
+We implemented Boyer-Moore using bad character and good suffix preprocessing,
+and tested its performance compared to the naive method.
+
 \subsection{Empirical comparison}
 
-We evaluated the performance of the naive string search algorithm considering a
-pattern size of 100 and text sizes that ranged from 100 to 10,000 characters
-with a step size of 100.  The performance metrics include runtime and memory
-usage. For each text size, we ran a single search where we generated a random
-string for $T$ from the alphabet ${A, C, T, G}$ and extracted a random
-substring $P$ from $T$. We then recorded the runtime and memory usage of the
-algorithm consiuder that $P$ and $T$. After the round was complete for a given
-text size, we calculated the average runtime and memory usage for the search.
+We evaluated the performance of the naive and Boyer-Moore string search
+algorithms considering a pattern size of 100 and text sizes that ranged from
+100 to 10,000 characters with a step size of 100. The performance metrics
+include runtime and memory usage. For each text size, we ran a single search
+where we generated a random string for $T$ from the alphabet ${A, C, T, G}$ and
+extracted a random substring $P$ from $T$. We then recorded the runtime and
+memory usage of the algorithm considering that $P$ and $T$. After the round was
+complete for a given text size, we calculated the average runtime and memory
+usage for the search.
+
+Boyer-Moore consistently outperformed the naive method in runtime, especially
+as the text size increased. However, it required more preprocessing time and
+slightly more memory.
 
 \subsection{Reproducibility}
 To replicate these experiments, clone the repository and then run the
@@ -79,7 +97,15 @@ $ python src/string_search.py \
     --text_range 100 10000 100 \
     --pattern_size 100 \
     --rounds 1 \
+    --algorithm naive \
     --out_file doc/naive_search.png
+
+$ python src/string_search.py \
+    --text_range 100 10000 100 \
+    --pattern_size 100 \
+    --rounds 1 \
+    --algorithm boyer_moore \
+    --out_file doc/boyer_moore_search.png
 \end{verbatim}
 %%%% Add your command here%%%%
 

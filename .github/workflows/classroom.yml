@@ -2,7 +2,7 @@ name: Autograding Tests
 'on':
   repository_dispatch: []
   schedule:
-  - cron: ''
+  - cron: '10 7 * * *'
 permissions:
   checks: write
   actions: read
@@ -19,14 +19,21 @@ jobs:
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: test
-        setup-command: ''
+        setup-command: pip install numpy
         command: python src/string_search.py \     --text_range 100 10000 100 \     --pattern_size
           100 \     --rounds 1 \     --out_file doc/naive_search.png
         timeout: 10
         max-score: 10
+    - name: install plot
+      id: install-plot
+      uses: classroom-resources/autograding-python-grader@v1
+      with:
+        timeout: 10
+        setup-command: numpy matplotlib
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
         TEST_RESULTS: "${{steps.test.outputs.result}}"
+        INSTALL-PLOT_RESULTS: "${{steps.install-plot.outputs.result}}"
       with:
-        runners: test
+        runners: test,install-plot

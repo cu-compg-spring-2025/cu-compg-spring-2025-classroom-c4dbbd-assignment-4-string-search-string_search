@@ -40,16 +40,39 @@ def get_good_suffix_table(P):
                 good_suffix_table[j] = min(good_suffix_table[j], j + i)
     return good_suffix_table
 
-def get_bad_char_table(P):
+ef get_bad_char_table(P):
+    m = len(P)
     bad_char_table = {}
-    #####################################################################
-    ## ADD CODE HERE
-    #####################################################################
+    
+    for i in range(m):
+        bad_char_table[P[i]] = i  # Store the last occurrence of each character
+    
     return bad_char_table
 
 def boyer_moore_search(T, P):
+    n, m = len(T), len(P)
+    if m == 0 or n < m:
+        return []
+    
+    bad_char_table = get_bad_char_table(P)
+    good_suffix_table = get_good_suffix_table(P)
+    
     occurrences = []
-    #####################################################################
-    ## ADD CODE HERE
-    #####################################################################
+    s = 0  # Shift of the pattern with respect to text
+    
+    while s <= n - m:
+        j = m - 1
+        
+        while j >= 0 and P[j] == T[s + j]:
+            j -= 1
+        
+        if j < 0:
+            occurrences.append(s)
+            s += good_suffix_table[0]  # Use full pattern shift
+        else:
+            bad_char_shift = j - bad_char_table.get(T[s + j], -1)
+            good_suffix_shift = good_suffix_table.get(j + 1, 1)
+            
+            s += max(bad_char_shift, good_suffix_shift)
+    
     return occurrences
